@@ -10,3 +10,23 @@ var config = {
 firebase.initializeApp(config);
 
 let database = firebase.database();
+
+// chat form
+$("#chat-submit").on("click", function(event) {
+  event.preventDefault();
+  // grab chat text
+  let chatLine = $("#chat-line").val().trim();
+
+  // send to database
+  database.ref().child('chat').push({
+    allChat: chatLine,
+    dateAdded: firebase.database.ServerValue.TIMESTAMP
+  });
+});
+
+database.ref('chat').on("child_added", function(snapshot, prevChildKey) {
+  let newPost = snapshot.val();
+  $("#chat-history").append("<div>" + newPost.allChat + "</div>")
+}, function(errorObject) {
+    console.log("Errors handled: " + errorObject.code);
+});
