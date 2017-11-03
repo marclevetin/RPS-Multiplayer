@@ -13,12 +13,16 @@
       <h1>Rock Paper Scissors</h1>
       <div class="row">
         <div class="col-12">
-          Name form goes here
+          If player name is not saved in the database, show form.  Else, hide form and show player name in appropriate spot on page.
+          <form class="form-inline">
+            <input id="name-entry" class="form-control col-5" type="text" name="playerName" placeholder="enter your name" />
+            <input id="name-submit" class="btn btn-primary col-2" type="submit" value="Let's play!">
+          </form>
         </div>
       </div>
       <div class="row">
         <div class="col-4">
-          Player 1 goes here
+          <span id="player-one">Player 1 goes here</span>
         </div>
         <div class="col-4">
           Game results go here
