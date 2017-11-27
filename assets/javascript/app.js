@@ -37,17 +37,79 @@ $("#name-submit").on("click", function(event) {
   event.preventDefault;
 
   let playerName = $("#name-entry").val().trim();
-  debugger;
-  database.ref('players/player1').update({
+
+  let currentPlayerOne = $("#player-one").text();
+  let databaseLocation;
+
+  if (currentPlayerOne === "Player 1 goes here") {
+    databaseLocation = 'players/player1'
+  } else {
+    databaseLocation = 'players/player2'
+  }
+
+  database.ref(databaseLocation).update({
     name: playerName,
     dateAdded: firebase.database.ServerValue.TIMESTAMP
   })
 });
 
-// player name (show player name)
-database.ref('players/player1').on("value", function(snapshot) {
-  let playerName = snapshot.val().name;
-  $("#player-one").html(playerName);
+// player name (show player names)
+database.ref('players').on("value", function(snapshot) {
+  let playerData = snapshot.val();
+  $("#player-one").html(playerData.player1.name);
+  $("#player-two").html(playerData.player2.name);
   }, function(errorObject) {
     console.log("Errors handled: " + errorObject.code);
 });
+
+// process player selections
+$(".rps-selection").on("click", "li", function(){
+  let selection = $(this).text().trim();
+  let player = $(this).parent().siblings()[0].id;
+  let databaseLocation;
+
+  if (player === "player-one") {
+    databaseLocation = 'players/player1'
+  } else {
+    databaseLocation = 'players/player2'
+  }
+
+  // save selection to database
+  database.ref(databaseLocation).update({
+    playerChoice: selection
+  })
+
+  // change view so a new selection can't be made
+  $(this).parent().remove()
+
+  gameWon()
+})
+// game engine
+function gameWon() {
+  database.ref('players').on('value', function(snapshot){
+    let playerOneChoice = snapshot.val().player1.playerChoice;
+    let playerTwoChoice = snapshot.val().player2.playerChoice;
+    let winnerMessage;
+
+    // Rock beats Scissors
+    // Scissors beats paper
+    // Paper beats Rock
+
+    if (playerOneChoice === "" || playerTwoChoice === "") {
+      winnerMessage = "not ready yet"
+    } else if (playerOneChoice === playerTwoChoice) {
+      winnerMessage = "It's a tie!"
+    } else if (playerOneChoice === "Rock" && playerTwoChoice === "Scissors") {
+      winnerMessage = "Player 1 wins!"
+    } else if (playerOneChoice === "Scissors" && playerTwoChoice === "Paper") {
+      winnerMessage = "Player 1 wins!"
+    } else if (playerOneChoice === "Paper" && playerTwoChoice === "Rock") {
+      winnerMessage = "Player 1 wins!"
+    } else {
+      winnerMessage = "Player 2 wins!"
+    }
+
+    return winnerMessage
+
+  })
+}
